@@ -1,3 +1,4 @@
+import { showNotification } from "@mantine/notifications";
 import { type NextPage } from "next";
 import Head from "next/head";
 
@@ -15,7 +16,7 @@ const Home: NextPage = () => {
   const [rizz, rizzling] = useState<Rizz>([]);
   const [order, setOrder] = useState<string>("vote");
 
-  const { getAll, submit, downvote } = rizzAPI;
+  const { getAll, submit } = rizzAPI;
 
   const { data: rizzData } = getAll.useQuery();
 
@@ -27,19 +28,38 @@ const Home: NextPage = () => {
 
   const rizzCreation = submit.useMutation({
     onSuccess(data) {
-      rizzling((prev) => [...prev, data]);
+      if (data) {
+        rizzling((prev) => [...prev, data]);
+        showNotification({
+          message: "Rizz added! 💦",
+          autoClose: 1500,
+          style: {
+            width: "200px",
+          },
+        });
+      }
     },
-  });
-
-  const downvoteCreation = downvote.useMutation({
-    onSuccess(data) {
-      rizzling((prev) => {
-        const index = prev.findIndex((rizz) => rizz.id === data.id);
-        prev[index] = data;
-        return prev;
+    onError: (error) => {
+      showNotification({
+        message: error.message,
+        autoClose: 1500,
+        color: "red",
+        style: {
+          width: "200px",
+        },
       });
     },
   });
+
+  // const downvoteCreation = downvote.useMutation({
+  //   onSuccess(data) {
+  //     rizzling((prev) => {
+  //       const index = prev.findIndex((rizz) => rizz.id === data.id);
+  //       prev[index] = data;
+  //       return prev;
+  //     });
+  //   },
+  // });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,29 +111,31 @@ const Home: NextPage = () => {
             />
             <button
               type="submit"
-              className="mx-1 rounded bg-sky-400 px-3 hover:bg-sky-300"
+              className="mx-1 rounded bg-sky-400 px-3 text-white hover:bg-sky-300"
             >
               add
             </button>
           </form>
 
-          <ul className="flex flex-col">
-            <label htmlFor="order" className="text-white">
-              Sort:
-            </label>
+          <div className="m-4" />
 
-            <select
-              name="order"
-              id="order"
-              value={order}
-              onChange={handleOrder}
-              className="w-24 rounded"
-            >
-              <option value="vote">by vote</option>
-              <option value="alphabetical">by name</option>
-            </select>
-            <div className="m-7" />
+          <label htmlFor="order" className="text-white">
+            Sort:
+          </label>
 
+          <select
+            name="order"
+            id="order"
+            value={order}
+            onChange={handleOrder}
+            className="w-24 rounded"
+          >
+            <option value="vote">by vote</option>
+            <option value="alphabetical">by name</option>
+          </select>
+          <div className="m-7" />
+
+          <ul className="mb-6 flex flex-col">
             {rizz.map((rizz) => (
               <li key={rizz.id}>
                 <RizzRow data={rizz} />

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { api, type RouterOutputs } from "~/utils/api";
 
+import { Notification } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+
 type Rizz = RouterOutputs["rizz"]["getAll"][number];
 
 type Props = {
@@ -27,6 +30,16 @@ const RizzRow = ({ data }: Props) => {
     likeCreation.mutate({ id: data.id });
     setCanLike(false);
     setStartTimer(true);
+
+    showNotification({
+      message: "Liked!",
+      color: "pink",
+      autoClose: 1500,
+      className: "max-w-[200px]",
+      style: {
+        width: "200px",
+      },
+    });
   };
 
   useEffect(() => {

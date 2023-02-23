@@ -1,10 +1,61 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 
-import { api } from "~/utils/api";
+import { useState, useEffect } from "react";
+
+import { api, type RouterOutputs } from "~/utils/api";
+
+type Rizz = RouterOutputs["rizz"]["getAll"];
+
+const rizzAPI = api.rizz;
 
 const Home: NextPage = () => {
+  const [cook, cooking] = useState("");
+  const [rizz, rizzling] = useState<Rizz>([]);
+
+  const { getAll, submit, upvote, downvote } = rizzAPI;
+
+  const { data: rizzData } = getAll.useQuery();
+
+  useEffect(() => {
+    if (rizzData) {
+      rizzling(rizzData);
+    }
+  }, [rizzData]);
+
+  const rizzCreation = submit.useMutation({
+    onSuccess(data) {
+      rizzling((prev) => [...prev, data]);
+    },
+  });
+
+  const upvoteCreation = upvote.useMutation({
+    onSuccess(data) {
+      rizzling((prev) => {
+        const index = prev.findIndex((rizz) => rizz.id === data.id);
+        prev[index] = data;
+        return prev;
+      });
+    },
+  });
+
+  const downvoteCreation = downvote.useMutation({
+    onSuccess(data) {
+      rizzling((prev) => {
+        const index = prev.findIndex((rizz) => rizz.id === data.id);
+        prev[index] = data;
+        return prev;
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    rizzCreation.mutate({ name: cook });
+    cooking("");
+  };
+
   return (
     <>
       <Head>
@@ -17,6 +68,45 @@ const Home: NextPage = () => {
           <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             The <span className="text-[hsl(280,100%,70%)]">Rizzclopedia</span>
           </h1>
+        </div>
+
+        <div>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="habit"
+              className="mr-5 rounded border-2 border-amber-500"
+              value={cook}
+              onChange={(e) => cooking(e.target.value)}
+            />
+            <button type="submit">create</button>
+          </form>
+
+          <ul className="flex flex-col">
+            {rizz.map((rizz) => (
+              <li key={rizz.id}>
+                <div className="around flex w-[70vw] flex-row justify-between rounded-lg text-white">
+                  <span className="capitalize">{rizz.rizz}</span>
+
+                  <div>
+                    <button
+                      onClick={() => upvoteCreation.mutate({ id: rizz.id })}
+                      className="mx-2 rounded bg-sky-400 px-3 hover:bg-sky-300"
+                    >
+                      +
+                    </button>
+                    {rizz.votes}
+                    <button
+                      onClick={() => downvoteCreation.mutate({ id: rizz.id })}
+                      className="mx-2 rounded bg-sky-400 px-3 hover:bg-sky-300"
+                    >
+                      -
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </main>
     </>

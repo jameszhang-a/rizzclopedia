@@ -14,6 +14,11 @@ export const rizzRouter = createTRPCRouter({
   submit: publicProcedure
     .input(z.object({ name: z.string() }))
     .mutation(({ ctx, input }) => {
+      // make sure the input contains the word "rizz" in it
+      if (!input.name.toLowerCase().includes("rizz")) {
+        throw new Error("not enough rizz");
+      }
+
       return ctx.prisma.rizz.create({
         data: {
           rizz: input.name,

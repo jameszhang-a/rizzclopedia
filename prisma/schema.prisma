@@ -13,6 +13,6 @@ model Rizz {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    rizz  String
+    rizz  String @unique
     votes Int    @default(1)
 }

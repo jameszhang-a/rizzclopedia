@@ -33,12 +33,9 @@ const RizzRow = ({ data }: Props) => {
 
     showNotification({
       message: "Liked!",
-      color: "pink",
+      color: "teal",
       autoClose: 1500,
       className: "max-w-[200px]",
-      style: {
-        width: "200px",
-      },
     });
   };
 

@@ -16,7 +16,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         colorScheme: "dark",
       }}
     >
-      <NotificationsProvider limit={3}>
+      <NotificationsProvider
+        limit={3}
+        position="top-right"
+        containerWidth={350}
+      >
         <Component {...pageProps} />
       </NotificationsProvider>
     </MantineProvider>

@@ -1,5 +1,6 @@
 import { showNotification } from "@mantine/notifications";
 import { type NextPage } from "next";
+import Image from "next/image";
 import Head from "next/head";
 
 import { useState, useEffect } from "react";
@@ -33,9 +34,6 @@ const Home: NextPage = () => {
         showNotification({
           message: "Rizz added! 💦",
           autoClose: 1500,
-          style: {
-            width: "200px",
-          },
         });
       }
     },
@@ -44,22 +42,9 @@ const Home: NextPage = () => {
         message: error.message,
         autoClose: 1500,
         color: "red",
-        style: {
-          width: "200px",
-        },
       });
     },
   });
-
-  // const downvoteCreation = downvote.useMutation({
-  //   onSuccess(data) {
-  //     rizzling((prev) => {
-  //       const index = prev.findIndex((rizz) => rizz.id === data.id);
-  //       prev[index] = data;
-  //       return prev;
-  //     });
-  //   },
-  // });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,14 +75,14 @@ const Home: NextPage = () => {
         <meta name="description" content="For all your rizz needs" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
+      <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] font-medium">
         <div className="px-4 py-16">
-          <h1 className="text-xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+          <h1 className="text-xxl font-extrabold tracking-tight text-white sm:text-[4rem]">
             The <span className="text-[hsl(280,100%,70%)]">Rizzclopedia</span>
           </h1>
         </div>
 
-        <div>
+        <section about="Rizz ranking" className="w-screen px-7 sm:w-[500px]">
           <form
             onSubmit={handleSubmit}
             className="flex flex-row items-center justify-center"
@@ -105,13 +90,13 @@ const Home: NextPage = () => {
             <input
               type="text"
               name="habit"
-              className="mr-5 rounded border-2 border-amber-500"
+              className="mr-1 rounded p-1"
               value={cook}
               onChange={(e) => cooking(e.target.value)}
             />
             <button
               type="submit"
-              className="mx-1 rounded bg-sky-400 px-3 text-white hover:bg-sky-300"
+              className="mx-1 rounded bg-sky-400 px-3 py-1 text-white hover:bg-sky-300"
             >
               add
             </button>
@@ -119,30 +104,45 @@ const Home: NextPage = () => {
 
           <div className="m-4" />
 
-          <label htmlFor="order" className="text-white">
-            Sort:
-          </label>
+          <div>
+            <label htmlFor="order" className="mr-2 text-white">
+              Sort:
+            </label>
+            <select
+              name="order"
+              id="order"
+              value={order}
+              onChange={handleOrder}
+              className="w-24 rounded"
+            >
+              <option value="vote">by vote</option>
+              <option value="alphabetical">by name</option>
+            </select>
+          </div>
 
-          <select
-            name="order"
-            id="order"
-            value={order}
-            onChange={handleOrder}
-            className="w-24 rounded"
-          >
-            <option value="vote">by vote</option>
-            <option value="alphabetical">by name</option>
-          </select>
           <div className="m-7" />
 
           <ul className="mb-6 flex flex-col">
-            {rizz.map((rizz) => (
-              <li key={rizz.id}>
-                <RizzRow data={rizz} />
-              </li>
-            ))}
+            {rizz.length < 1 ? (
+              <div className="flex flex-row items-center gap-2">
+                <Image
+                  src="/Rolling-1s-200px.svg"
+                  alt="spinner image"
+                  className="animate-spin"
+                  width={50}
+                  height={50}
+                ></Image>{" "}
+                Loading...
+              </div>
+            ) : (
+              rizz.map((rizz) => (
+                <li key={rizz.id} className="pb-2">
+                  <RizzRow data={rizz} />
+                </li>
+              ))
+            )}
           </ul>
-        </div>
+        </section>
       </main>
     </>
   );

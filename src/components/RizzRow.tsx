@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { api, type RouterOutputs } from "~/utils/api";
 
-import { Notification } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
+import Image from "next/image";
+
+import { default as c } from "classnames";
 
 type Rizz = RouterOutputs["rizz"]["getAll"][number];
 
@@ -10,13 +12,16 @@ type Props = {
   data: Rizz;
 };
 
-const rizzAPI = api.rizz;
 const LIKE_TIMEOUT = 2 * 60 * 1000;
+const likeButton = "flex flex-row items-center gap-1 rounded px-2 py-1";
+
+const rizzAPI = api.rizz;
 
 const RizzRow = ({ data }: Props) => {
   const [likes, setLikes] = useState(data.votes);
   const [canLike, setCanLike] = useState(true);
   const [startTimer, setStartTimer] = useState(false);
+  const [clicked, setClicked] = useState(false);
 
   const { upvote } = rizzAPI;
 
@@ -30,12 +35,12 @@ const RizzRow = ({ data }: Props) => {
     likeCreation.mutate({ id: data.id });
     setCanLike(false);
     setStartTimer(true);
+    setClicked(true);
 
     showNotification({
       message: "Liked!",
       color: "teal",
       autoClose: 1500,
-      className: "max-w-[200px]",
     });
   };
 
@@ -53,36 +58,30 @@ const RizzRow = ({ data }: Props) => {
       clearTimeout(timeout);
     };
   }, [startTimer]);
+  console.log(clicked);
 
   return (
-    <div className="around flex w-[400px] flex-row justify-between rounded-lg pb-2 text-white md:w-[500px]">
+    <div className="around flex flex-row justify-between rounded-lg text-white">
       <span className="capitalize">{data.rizz}</span>
-
       <div className="flex flex-row">
-        {canLike ? (
-          <button
-            onClick={handleLike}
-            className="mx-2 max-h-6 rounded bg-sky-400 px-3 hover:bg-sky-300 hover:px-[13px]"
-          >
-            ♥
-          </button>
-        ) : (
-          <button
-            onClick={handleLike}
-            className="mx-2 rounded bg-red-400 px-3 "
-            disabled
-          >
-            ♥
-          </button>
-        )}
-
-        <div className="min-w-[2rem] text-center">{likes}</div>
-        {/* <button
-                      onClick={() => downvoteCreation.mutate({ id: rizz.id })}
-                      className="mx-2 rounded bg-sky-400 px-3 hover:bg-sky-300"
-                    >
-                      -
-                    </button> */}
+        <button
+          onClick={handleLike}
+          className={c(
+            likeButton,
+            canLike ? "bg-sky-400" : "bg-red-400",
+            clicked ? "animate-wiggle" : ""
+          )}
+          disabled={!canLike}
+          onAnimationEnd={() => setClicked(false)}
+        >
+          <Image
+            src="./heart-white.svg"
+            alt="heart icon"
+            width={20}
+            height={20}
+          />
+          <span className="min-w-[2rem] text-center">{likes}</span>
+        </button>
       </div>
     </div>
   );

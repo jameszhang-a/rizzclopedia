@@ -12,14 +12,13 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       withGlobalStyles
       withNormalizeCSS
       theme={{
-        /** Put your mantine theme override here */
         colorScheme: "dark",
       }}
     >
       <NotificationsProvider
         limit={3}
         position="top-right"
-        containerWidth={350}
+        containerWidth={300}
       >
         <Component {...pageProps} />
       </NotificationsProvider>
